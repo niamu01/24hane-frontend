@@ -11,6 +11,9 @@ import NotificationView from "@/views/NotificationView.vue";
 import axios from "axios";
 import { createRouter, createWebHistory } from "vue-router";
 
+const accessTokenName = import.meta.env.VITE_ACCESS_TOKEN;
+const refreshTokenName = import.meta.env.VITE_REFRESH_TOKEN;
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -62,7 +65,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const token = getCookie("accessToken");
+  const token = getCookie(accessTokenName);
 
   // 이미 로그인된 상태에서 로그인 페이지로 이동 시 홈으로 리다이렉트
   const isNavigatingToLogin = to.name === "login";
@@ -80,14 +83,14 @@ router.beforeEach(async (to, from, next) => {
         {},
         { withCredentials: true }
       );
-      setCookie("accessToken", response.data.accessToken);
+      setCookie(accessTokenName, response.data.accessToken);
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${response.data.accessToken}`;
       return next();
     } catch (error) {
-      removeCookie("accessToken");
-      removeCookie("refreshToken");
+      removeCookie(accessTokenName);
+      removeCookie(refreshTokenName);
       clearStorage();
       alert("로그인 정보가 유효하지 않습니다.\n다시 로그인해주세요.2");
       return next({ name: "login" });

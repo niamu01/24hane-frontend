@@ -3,6 +3,9 @@ import { getCookie, setCookie, removeCookie } from "./cookie/cookies";
 import { STATUS_401_UNAUTHORIZED } from "@/constants/statusCode";
 import { clearStorage } from "@/utils/localStorage";
 
+const accessTokenName = import.meta.env.VITE_ACCESS_TOKEN;
+const refreshTokenName = import.meta.env.VITE_REFRESH_TOKEN;
+
 export const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
   withCredentials: true,
@@ -10,7 +13,7 @@ export const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = getCookie("accessToken");
+    const token = getCookie(accessTokenName);
     if (config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -62,7 +65,7 @@ instance.interceptors.response.use(
             { withCredentials: true }
           )
           .then(({ data }) => {
-            setCookie("accessToken", data.accessToken);
+            setCookie(accessTokenName, data.accessToken);
             axios.defaults.headers.common[
               "Authorization"
             ] = `Bearer ${data.accessToken}`;
@@ -73,8 +76,8 @@ instance.interceptors.response.use(
             resolve(instance(originalRequest));
           })
           .catch((err) => {
-            removeCookie("accessToken");
-            removeCookie("refreshToken");
+            removeCookie(accessTokenName);
+            removeCookie(refreshTokenName);
             clearStorage();
             window.location.href = "/";
             if (!isAlert) {
