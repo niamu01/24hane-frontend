@@ -92,7 +92,7 @@ router.beforeEach(async (to, from, next) => {
       removeCookie(accessTokenName);
       removeCookie(refreshTokenName);
       clearStorage();
-      alert("로그인 정보가 유효하지 않습니다.\n다시 로그인해주세요.2");
+      alert("로그인 정보가 유효하지 않습니다.\n다시 로그인해주세요.");
       return next({ name: "login" });
     }
   }
